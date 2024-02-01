@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="641px" height="139px" viewBox="0 0 641 139" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 48.1 (47250) - http://www.bohemiancoding.com/sketch -->
+    <title>how it works</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0.000438854029%" x2="50%" y2="99.8448212%" id="linearGradient-1">
+            <stop stop-color="#4387FD" offset="0%"></stop>
+            <stop stop-color="#4683EA" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="1-Fuctions_overview" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(-557.000000, -937.000000)">
+        <g id="how-it-works" transform="translate(541.000000, 937.000000)">
+            <text id="Responds-to-events" font-family="Roboto-Regular, Roboto" font-size="12" font-weight="normal" line-spacing="16" fill="#8FA3AD">
+                <tspan x="289" y="135">Responds to events</tspan>
+            </text>
+            <path d="M285.6881,119 L395.255438,119" id="Path-7-Copy" stroke="#CED7DB"></path>
+            <g id="Group-16" transform="translate(94.000000, 18.000000)">
+                <path d="M0.5,11.5 L188.5,11.5" id="Line" stroke="#AFBDC4" stroke-width="5" stroke-linecap="square" stroke-dasharray="1"></path>
+                <polygon id="Path-5" fill="#AFBDC4" points="199 11.6052118 186 0 186 23"></polygon>
+            </g>
+            <g id="Group-16-Copy-2" transform="translate(365.000000, 31.000000)">
+                <path d="M0.5,11.5 L188.5,11.5" id="Line" stroke="#AFBDC4" stroke-width="5" stroke-linecap="square" stroke-dasharray="1,11"></path>
+                <polygon id="Path-5" fill="#AFBDC4" points="196 11.6052118 183 0 183 23"></polygon>
+            </g>
+            <g id="Group-16-Copy" transform="translate(206.500000, 62.500000) scale(-1, 1) translate(-206.500000, -62.500000) translate(107.000000, 51.000000)">
+                <path d="M0.5,11.5 L188.5,11.5" id="Line" stroke="#AFBDC4" stroke-width="5" stroke-linecap="square" stroke-dasharray="1,11"></path>
+                <polygon id="Path-5" fill="#AFBDC4" points="199 11.6052118 186 0 186 23"></polygon>
+            </g>
+            <g id="ic_cloud_circle_24px" transform="translate(20.000000, 3.000000)">
+                <circle id="Oval-8" fill="#5C6BC0" cx="42" cy="42" r="42"></circle>
+                <path d="M55.0357143,54 L31.3571429,54 C26.7328571,54 23,50.2777778 23,45.6666667 C23,41.0555556 26.7328571,37.3333333 31.3571429,37.3333333 L31.7471429,37.3611111 C32.9728571,32.5555556 37.2907143,29 42.5,29 C48.6564286,29 53.6428571,33.9722222 53.6428571,40.1111111 L55.0357143,40.1111111 C58.88,40.1111111 62,43.2222222 62,47.0555556 C62,50.8888889 58.88,54 55.0357143,54 Z" id="Shape" fill="#FFFFFF" fill-rule="nonzero"></path>
+            </g>
+            <text id="Cloud-Services" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="15.9121094" y="110">Cloud Services</tspan>
+            </text>
+            <text id="Emit-events" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="155.602051" y="19">Emit events</tspan>
+            </text>
+            <text id="Writes-back" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="160.437988" y="81">Writes back</tspan>
+            </text>
+            <text id="Invokes-other-servic" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="393.550293" y="28">Invokes other services</tspan>
+            </text>
+            <text id="Other-APIs" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="581.739746" y="110">Other APIs</tspan>
+            </text>
+            <g id="Cloud-Function_128px" transform="translate(296.000000, 3.000000)" fill-rule="nonzero">
+                <path d="M19.5405855,76.9123591 L1.08321138,44.5876765 C-0.361070458,42.0582795 -0.361070458,38.9419338 1.08321138,36.4125368 L19.5405855,4.08792528 C20.9847979,1.55838594 23.653975,6.92195174e-05 26.5426259,0 L63.4571632,0 C66.3458141,6.92195174e-05 69.0149912,1.55838594 70.4592035,4.08792528 L88.9167886,36.4123235 C90.3610705,38.9417205 90.3610705,42.0580662 88.9167886,44.5874632 L70.4594145,76.9120747 C69.0152021,79.4416141 66.346025,80.9999308 63.4573741,81 L26.5426259,81 C23.654033,80.9999894 20.9848694,79.441789 19.5405855,76.9123591 Z" id="Shape" fill="url(#linearGradient-1)"></path>
+                <path d="M66.0186479,29.78236 L63.3507428,32.4568671 L63.935122,49.3113486 L61.4743865,52.8894557 L60.0463631,51.4581843 L61.3561566,51.4581843 L61.3561566,45.5940724 L55.0648863,39.2873051 L50.5411494,41.5535205 L50.6707819,42.0592593 L34.6510935,26 L26.9375724,29.9003824 L26,37.7998088 L28.6679051,52.257693 L32.5336452,56.0547701 L30.8780702,58.743137 L53.0799923,81 L63.3074132,81 C66.2352395,80.9999304 68.9406156,79.4339911 70.4044142,76.8920782 L86,49.8128723 L66.0186479,29.78236 Z" id="Shape" fill="#000000" opacity="0.07"></path>
+                <polygon id="Shape" fill="#FFFFFF" points="30.3335642 59 34 55.1687204 28.5058868 49.4275907 28.5058868 31.5724093 34 25.8312796 30.3335642 22 23 29.6632829 23 51.3367171"></polygon>
+                <circle id="Oval" fill="#FFFFFF" cx="37" cy="41" r="3"></circle>
+                <circle id="Oval" fill="#FFFFFF" cx="45" cy="41" r="3"></circle>
+                <circle id="Oval" fill="#FFFFFF" cx="54" cy="41" r="3"></circle>
+                <polygon id="Shape" fill="#FFFFFF" points="58.6664358 22 55 25.8312796 60.4941132 31.5724093 60.4941132 49.4275907 55 55.1687204 58.6664358 59 66 51.3367171 66 29.6632829"></polygon>
+            </g>
+            <text id="Cloud-Functions" font-family="Roboto-Regular, Roboto" font-size="14" font-weight="normal" fill="#8FA3AD">
+                <tspan x="290.509766" y="110">Cloud Functions</tspan>
+            </text>
+            <g id="ic_web_24px" transform="translate(573.000000, 0.000000)">
+                <circle id="Oval-8-Copy" fill="#5C6BC0" cx="42" cy="42" r="42"></circle>
+                <path d="M55.6,28 L28.4,28 C26.53,28 25.017,29.5506757 25.017,31.4459459 L25,52.1216216 C25,54.0168919 26.53,55.5675676 28.4,55.5675676 L55.6,55.5675676 C57.47,55.5675676 59,54.0168919 59,52.1216216 L59,31.4459459 C59,29.5506757 57.47,28 55.6,28 Z M47.0540541,50.972973 L27.7567568,50.972973 L27.7567568,44.5405405 L47.0540541,44.5405405 L47.0540541,50.972973 Z M47.0540541,42.7027027 L27.7567568,42.7027027 L27.7567568,36.2702703 L47.0540541,36.2702703 L47.0540541,42.7027027 Z M54.4054054,51.8918919 L47.972973,51.8918919 L47.972973,36.2702703 L54.4054054,36.2702703 L54.4054054,51.8918919 Z" id="Shape" fill="#FFFFFF" fill-rule="nonzero"></path>
+            </g>
+        </g>
+    </g>
+</svg>
