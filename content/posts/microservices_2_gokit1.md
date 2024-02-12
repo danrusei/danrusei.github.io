@@ -2,7 +2,6 @@
 title: "Part 2: Microservices - Create the App with Go-kit"
 date: 2019-06-24
 draft: false
-tags: ["Microservices", "Go Kit"]
 categories: ["Go"]
 author: "Dan Rusei"
 

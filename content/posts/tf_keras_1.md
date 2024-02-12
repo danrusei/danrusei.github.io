@@ -2,7 +2,6 @@
 title: "Part 1: Exploring Tensorflow 2 - Keras API"
 date: 2020-02-17
 draft: false
-tags: ["TF Keras"]
 categories: ["TensorFlow"]
 author: "Dan Rusei"
 

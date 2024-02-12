@@ -2,7 +2,6 @@
 title: "UI Flutter Rest API"
 date: 2019-10-07
 draft: false
-tags: ["Provider"]
 categories: ["Flutter"]
 author: "Dan Rusei"
 

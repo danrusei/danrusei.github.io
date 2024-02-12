@@ -3,7 +3,6 @@ title: "Part 2: Diagnose Go code - beginner guide "
 date: 2020-04-12T15:43:48+08:00
 lastmod: 2020-04-12T15:43:48+08:00
 draft: false
-tags: ["pprof"]
 categories: ["Go"]
 author: "Dan Rusei"
 

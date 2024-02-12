@@ -2,7 +2,6 @@
 title: "Continuous Delivery with Cloud Build & Cloud Run"
 date: 2019-09-18
 draft: false
-tags: ["Cloud Run - Build"]
 categories: ["Cloud"]
 author: "Dan Rusei"
 

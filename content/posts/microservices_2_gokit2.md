@@ -2,7 +2,6 @@
 title: "Part 2 - cont: Microservices - Create the App with Go-kit"
 date: 2019-06-28
 draft: false
-tags: ["Microservices", "Go Kit", "GRPC"]
 categories: ["Go"]
 author: "Dan Rusei"
 

@@ -2,7 +2,6 @@
 title: "Part 2: Demystifying gRPC"
 date: 2020-01-10
 draft: false
-tags: ["GRPC"]
 categories: ["Go"]
 author: "Dan Rusei"
 

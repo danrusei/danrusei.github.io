@@ -2,7 +2,6 @@
 title: "Part 4: Microservices - Deploy on GKE + Istio"
 date: 2019-07-17
 draft: false
-tags: ["Microservices", "Istio"]
 categories: ["Kubernetes"]
 author: "Dan Rusei"
 

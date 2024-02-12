@@ -2,7 +2,6 @@
 title: "DialogFlow Webhook in GO"
 date: 2019-10-14
 draft: false
-tags: ["Dialogflow"]
 categories: ["Go"]
 author: "Dan Rusei"
 

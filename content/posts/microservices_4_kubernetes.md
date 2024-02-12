@@ -2,7 +2,6 @@
 title: "Part 3: Microservices - Deploy on Minikube"
 date: 2019-07-08
 draft: false
-tags: ["Microservices"]
 categories: ["Kubernetes"]
 author: "Dan Rusei"
 

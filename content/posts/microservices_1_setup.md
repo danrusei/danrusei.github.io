@@ -2,7 +2,6 @@
 title: "Part 1: Microservices - Ingesting data"
 date: 2019-06-15
 draft: false
-tags: ["Microservices", "Firestore"]
 categories: ["Go"]
 author: "Dan Rusei"
 

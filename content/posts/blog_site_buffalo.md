@@ -2,7 +2,6 @@
 title: "Part 3: Blog Site with Buffalo"
 date: 2019-05-27
 draft: false
-tags: ["Blog", "Buffalo"]
 categories: ["Go"]
 author: "Dan Rusei"
 

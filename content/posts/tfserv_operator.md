@@ -2,7 +2,6 @@
 title: "Simple Tensorflow Serving Operator"
 date: 2019-11-02
 draft: false
-tags: ["Kubebuilder"]
 categories: ["Kubernetes"]
 author: "Dan Rusei"
 

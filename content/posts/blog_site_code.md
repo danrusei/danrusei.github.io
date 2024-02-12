@@ -2,7 +2,6 @@
 title: "Part 2: Blog Site written in GO"
 date: 2019-05-20
 draft: false
-tags: ["Blog", "App Engine"]
 categories: ["Go"]
 author: "Dan Rusei"
 

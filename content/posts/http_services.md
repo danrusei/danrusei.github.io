@@ -2,7 +2,6 @@
 title: "HTTP Web Services"
 date: 2019-09-12
 draft: false
-tags: ["Architecture"]
 categories: ["Go"]
 author: "Dan Rusei"
 

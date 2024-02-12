@@ -2,7 +2,6 @@
 title: "Items Rest API & Web Page"
 date: 2019-09-30
 draft: false
-tags: ["JavaScript"]
 categories: ["Go"]
 author: "Dan Rusei"
 

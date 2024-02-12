@@ -2,7 +2,6 @@
 title: "Part 1: Blog Site with Hugo"
 date: 2019-05-10
 draft: false
-tags: ["Blog", "Hugo"]
 categories: ["Go"]
 author: "Dan Rusei"
 
