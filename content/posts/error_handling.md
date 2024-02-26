@@ -16,14 +16,15 @@ In this article I'll gradually go through a number of options of handling errors
 
 ## Using Unwrap method
 
-If you are experimenting or writing a simple program for personal use, you might be mostly interested by the happy path and handling the errors may not be so important at this stage. Rust provides a means for expeditious prototyping using the `Unwrap` method on `Option` and `Result` return types.
+If you are experimenting or writing a simple program for personal use, you might be mostly interested by the happy path and handling the errors may not be so important at this stage. Rust provides a means for expeditious prototyping using the `Unwrap` method on `Option<T>` and `Result<T, E>` return types.
 
-As a simple example, let's asume we are building a service part of an online grocery store that validates the customer inputs and confirm the order. The program expects a file_name as argument, read the content of the file and ensure that each line contain the mandatory fields/collumns. If the program is able to read the file and parse the part of the line, then the order is confirmed to the customer, otherwise the programs panics.
+As a simple example, let's asume that we are building a service, part of an online grocery store that validates the customer inputs and confirm the order. The program expects a file_name as argument, read the content of the file, parse the fields ensuring that each line contain the mandatory fields/collumns. If the parsing of the file succeeds, then the order is confirmed to the customer, otherwise the program panics.
+
+The below code is partial, the entire code, that can be found [HERE](https://github.com/danrusei/dev-state_blog_code/blob/master/error_handling/src/1_order_unwrap.rs)
 
 {{< code language="rust" isCollapsed="false" >}}
 
-\# [derive(Debug)]
-
+.# [derive(Debug)]
 struct UserCommand {
     product: String,
     quantity: u32,
@@ -61,9 +62,9 @@ fn main() {
 }
 {{< /code >}}
 
-The unwrap method is a simple way to extract the value from a Result or Option. It assumes that the operation was successful and retrieves the value if it is present, or panics if it encounters an error or a None value. There are multiple reasons for the program to panic, but first let's see the happy path when everything is well.
+The `unwrap` method is a simple way to extract the value from a `Result<T, E>` or `Option<T>`. It assumes that the operation was successful and retrieves the value if it is present, or panics if it encounters an error or a None value. There are multiple reasons for the above program to panic, but first let's see the happy path when everything went well.
 
-We provide the file that contain the customer order:
+The program reads the file that contain the customer order:
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cat order.txt
@@ -73,7 +74,7 @@ broccoli 3 14.05.2024
 spinach 6 14.05.2024
 {{< /code >}}
 
-and execute the code:
+and the result of a succesfull execution of the code:
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_unwrap order.txt
@@ -87,7 +88,7 @@ Your command was processed and it is ready for delivery. The ordered items:
 
 {{< /code >}}
 
-Now I'll insert 2 mistakes, first the command is executed without providing the file as argument, second the parsing to `u32` fails.
+Now I'll make 2 mistakes, first the command is executed without providing the file as argument. Second the parsing of the quantity to `u32` fails due to erroneous user input.  
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_unwrap
@@ -106,19 +107,19 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 {{< /code >}}
 
-In the first call, the panic occurred because the `unwrap` method was called on an `Option` that was in a `None` state. In the second call, the panic occurred because the unwrap method was called on a Result that was in an Err (error) state. The specific error is a `ParseIntError` with the kind `InvalidDigit`. This indicates a failure to parse a string as an integer due to an invalid digit.
+In the first call, the panic occurred because the `unwrap` method was called on an `Option<T>` that was in a `None` state. In the second call, the panic occurred because the unwrap method was called on a `Result<T, E>` that was in an Err (error) state. The specific error is a `ParseIntError` with the kind `InvalidDigit`. This indicates a failure to parse a string as an integer due to an invalid digit.
 
 ### Understand Result and Option enums
 
-If we investigate the return types for called functions:
+Let's investigate the return types to the called functions:
 
-* env::args() .nth(1) – > returns an `Option<String>`
-* fs::read_to_string(&file_name) → returns `io::Result<String>`,  which is a type alias of `result::Result<T, Error>`;
-* parts.next()  → returns `Option<&'a str>`
-* quant.trim().parse::<u32>() → returns `Result<u32, ParseIntError>`
-* NaiveDate::parse_from_str(d_date.trim(), "%d.%m.%Y") → returns `Result<NaiveDate, chrono::ParseError>`
+* env::args() .nth(1)             -> returns an `Option<String>`
+* fs::read_to_string(&file_name)  -> returns `io::Result<String>`,  which is a type alias of `result::Result<T, Error>`;
+* parts.next()                    -> returns `Option<&'a str>`
+* quant.trim().parse::<u32>()     -> returns `Result<u32, ParseIntError>`
+* NaiveDate::parse_from_str(d_date.trim(), "%d.%m.%Y") -> returns `Result<NaiveDate, chrono::ParseError>`
 
-`Result` and `Option` are two important enums in Rust that are used to represent the result of computations that may fail or values that may or may not be present. In practice, you'll often use `Result` for functions that can produce an error, and `Option` for functions that may or may not return a value.
+`Result<T, E>` and `Option<T>` are two important enums in Rust that are used to represent the result of computations that may fail or values that may or may not be present. In practice, you'll often use `Result<T,E>` for functions that can produce an error, and `Option<T>` for functions that may or may not return a value.
 
 #### Result Enum
 
@@ -131,11 +132,11 @@ enum Result<T, E> {
 }
 {{< /code >}}
 
-Result has two variants: Ok and Err.
+Result<T, E> has two variants: Ok and Err.
 
-* Ok represents the successful result with the associated value of type T.
-* Err represents an error with the associated value of type E.
-Result is commonly used for operations that may fail, and it ensures that error handling is explicit in Rust. For example, when opening a file, the Result type is used to indicate whether the operation was successful (Ok) or resulted in an error (Err). The error type (E) can be any type that describes the error, such as a string or a custom error enum.
+* Ok(T) -> represents the successful result with the associated value of type T.
+* Err(E) ->  represents an error with the associated value of type E.
+Result is commonly used for operations that may fail, and it ensures that error handling is explicit in Rust. For example, when opening a file, the Result<T, E> type is used to indicate whether the operation was successful (Ok) or resulted in an error (Err). The error type (E) can be any type that describes the error, such as a string or a custom error enum.
 
 #### Option Enum
 
@@ -150,10 +151,10 @@ enum Option<T> {
 
 Option has two variants: `Some` and `None`.
 
-* `Some` represent a value of type T.
+* `Some(T)` represent a value of type T.
 * `None` represents the absence of a value.
 
-Option is commonly used when a value might be missing or is optional. For example, when looking up a value in a collection, the result can be wrapped in an Option. If the value is present, it's wrapped in `Some`; otherwise, it's `None`.
+Option is commonly used when a value might be missing or is optional. For example, when looking up a value in a collection, the result can be wrapped in an Option<T>. If the value is present, it's wrapped in `Some`; otherwise, it's `None`.
 
 ## Using Expect method
 
@@ -190,7 +191,7 @@ let file_name = env::args()
     }
 {{< /code >}}
 
-Running the code with the mentioned mistakes:
+Running the code without providing the file as argument, and with erroneous user input for the quantity:
 
 {{< code language="bash" isCollapsed="false" >}}
 cargo run --bin order_expect
@@ -212,7 +213,7 @@ The `expect` method, as well as the `unwrap` method are provided by the `Option<
 
 ## Using Result and Option combinators and return Error as String
 
-In this version, the main function returns a `Result<(), String>`, where `()` represents a unit type. The `?` operator is used to propagate errors, and the `ok_or` and `map_err` methods are used to convert `Option<T>` and `Result<T, E>` to the desired error type. This ensures that any error during file reading, parsing, or processing is collected and returned as an `Err` variant with a descriptive error message.
+In this version, the main function returns a `Result<(), String>`, where `()` represents a unit type. The `ok_or` and `map_err` methods are used to convert `Option<T>` and `Result<T, E>` to the desired error type and the `?` operator to propagate errors to the caller. This ensures that any error during file reading, parsing, or processing is collected and returned as an `Err` variant with a descriptive error message.
 
 The below code is partial, the entire code can be found [HERE](https://github.com/danrusei/dev-state_blog_code/blob/master/error_handling/src/3_order_combinators.rs)
 
@@ -251,14 +252,14 @@ The below code is partial, the entire code can be found [HERE](https://github.co
  }
 {{< /code >}}
 
-Using the Result type with combinators and returning an `Err` variant with a descriptive error message is generally considered better than using `expect` for few reasons:
+Returning an `Err` variant with a descriptive error message is generally considered better than using `expect` for few reasons:
 
-* **Error Propagation**  Using `Result<T, E>` allows for more granular control over error handling and propagation. By using combinators like `ok_or` and `map_err`, you can handle different error cases at each step and provide specific error messages. With expect, a single failure at any step would cause the entire program to panic.
+* **Error Propagation**  Using `Result<T, E>` allows for more granular control over error handling and propagation. By using combinators like `ok_or` and `map_err`, can be handled different error cases at each step and provide specific error messages. With `expect`, a single failure at any step would cause the entire program to panic.
 * **Custom Error Messages** Using `map_err` allows you to customize error messages for each step. This can be crucial for debugging and understanding the nature of the error. `expect` provides a static error message, which might not be as informative or context-specific
 * **Avoiding Panics** Panicking is generally discouraged unless you are dealing with unrecoverable errors.
 * **Error Handling in Calling Code** By returning a `Result<T, E>`, the calling code has the opportunity to handle errors in a way that makes sense for the application. It can decide whether to log the error, display a user-friendly message, or take other appropriate actions.
 
-Running the code with the mentioned mistakes, notice that the program do not panics anymore:
+Running the code without providing the file as argument, and with erroneous user input for the quantity. Notice this time that the program do not panics anymore:
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_combinators
@@ -275,7 +276,7 @@ Error: "Invalid quantity format: invalid digit found in string"
 
 ## Using [anyhow crate](https://crates.io/crates/anyhow)
 
-In this version, the `anyhow::Result` type is used instead of `Result<(), String>`. The `anyhow::anyhow!` macro is used to create error instances with a more concise syntax. This approach provides a more flexible and ergonomic way of handling errors, making it easier to work with different error types and improving the readability of the code.
+In this version, the `anyhow::Result` type is used instead of `Result<(), String>`. With `anyhow::anyhow!` macro you can create error instances with a more concise syntax. The `anyhow` crate provides a more flexible and ergonomic way of handling errors, making it easier to work with different error types and improving the readability of the code.
 
 The `Context` trait is used to provide additional context information for the errors, making it easier to understand where the errors occurred. The `with_context` method is used to attach context information to the errors.
 
@@ -322,7 +323,7 @@ fn main() -> anyhow::Result<()> {
 Both `ok_or` and `ok_or_else` transforms the `Option<T>` into a `Result<T, E>`, mapping `Some(v)` to `Ok(v)` and `None` to `Err(err)`.
 However arguments passed to `ok_or` are eagerly evaluated, instead of `ok_or_else` which is lazily evaluated. If you are passing the result of a function call, it is recommended to use `ok_or_else`.
 
-Running the code with the mentioned mistakes, notice the additional context provided by anyhow:
+Running the code without providing the file as argument, and with erroneous user input for quantity. Notice the additional context provided by `anyhow`.
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_anyhow
@@ -341,26 +342,25 @@ Caused by:
 
 ## Using My Custom Error type
 
-If you are designing a library or an API you may want to propagate also application specific error types and the library consumers to see a predictibla set of error types.
+If you are designing a library or an API you may want to propagate also the application specific error types and the library consumers to see a predictible set of errors.
 
 Some advantages of using Custom Error type vs anyhow:
 
 * **Control and Flexibility** With a custom error enum, you have fine-grained control over the types of errors the application can encounter.
-* **Application-Specific Error Types** Can be defined error types that are specific to the application / library domain, providing meaningful and contextual error information.
+* **Application-Specific Error Types** Define error types that are specific to the application / library domain, providing meaningful and contextual error information.
 * **Predictable API**  Consumers of the API or library see a clear and predictable set of error types. This can make it easier for them to understand and handle errors.
 
 In the below example:
 
 * I've created a custom error enum `MyError` that represents different error cases.
 * I implemented the `fmt::Display` trait for `MyError` to provide custom error messages.
-* The `std::error::Error` trait is implemented for `MyError`.
+* Implement `std::error::Error` trait for `MyError`. The `std::error::Error` trait helps us to convert any type to an `Err` type.
 
 The below code is partial, the entire code can be found [HERE](https://github.com/danrusei/dev-state_blog_code/blob/master/error_handling/src/5_order_custom_error.rs)
 
 {{< code language="rust" isCollapsed="false" >}}
 
-\# [derive(Debug)]
-
+.# [derive(Debug)]
 enum MyError {
     CommandLineArgs,
     FileReadError(std::io::Error),
@@ -383,7 +383,7 @@ impl std::error::Error for MyError {}
 
 {{< /code >}}
 
-And the main program now returns a Result<(), MyError>:
+And the main program now returns `Result<(), MyError>`:
 
 {{< code language="rust" isCollapsed="false" >}}
 fn main() -> Result<(), MyError> {
@@ -432,7 +432,7 @@ fn main() -> Result<(), MyError> {
 }
 {{< /code >}}
 
-Running the code with the mentioned mistakes
+Running the code without providing the file as argument, and with erroneous user input for quantity.
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_custom_error
@@ -454,8 +454,8 @@ Using `thiserror` crate makes the code more concise and maintains the benefits o
 
 In the bellow example:
 
-* thiserror is added as dependency in Cargo.toml.
-* the `Error` trait is derived for the `MyError` enum using `#[derive(Error)]`.
+* `thiserror` is added as dependency in Cargo.toml.
+* the `Error` trait is derived for `MyError` enum using `#[derive(Error)]`.
 * the `#[error("...")]` attribute specify custom error messages for each variant of the enum.
 * `#[from]` attribute is used to automatically convert `std::io::Error` to `MyError::FileReadError`.
 * the `fmt::Display` trait implementation for `MyError` is automatically derived by `thiserror`.
@@ -465,7 +465,7 @@ The below code is partial, the entire code can be found [HERE](https://github.co
 {{< code language="rust" isCollapsed="false" >}}
 use thiserror::Error;
 
-\# [derive(Debug, Error)]
+.# [derive(Debug, Error)]
 enum MyError {
     #[error("Please provide a file name as a command-line argument.")]
     CommandLineArgs,
@@ -478,9 +478,9 @@ enum MyError {
 }
 {{< /code >}}
 
-The main program suffered no changes, as `thiserror` was only used on defining the Custom error.
+The main program suffered no changes, as `thiserror` was only used to define my Custom error.
 
-Running the code with the mentioned mistakes
+Running the code once again without providing the file as argument, and with erroneous user input for quantity.
 
 {{< code language="bash" isCollapsed="false" >}}
 $ cargo run --bin order_thiserror
@@ -494,8 +494,8 @@ $ cargo run --bin order_thiserror order.txt
 Error: ParsingError("Invalid quantity format in line 3: invalid digit found in string")
 {{< /code >}}
 
-If you still wonder when to use `thiserror` instead of `anyhow`, the author of the crates provided some guidance:
+If you are still wondering whether to use `thiserror` or `anyhow`, the author of the crates provided some guidance:
 
 *Use thiserror if you care about designing your own dedicated error type(s) so that the caller receives exactly the information that you choose in the event of failure. This most often applies to library-like code. Use Anyhow if you don't care what error type your functions return, you just want it to be easy. This is common in application-like code*
 
-I hope this article was fun and informative and helped you in making a decision on how to handle errors in Rust.
+I hope this article was fun and informative and gave you some alternatives on how to handle errors in Rust.
