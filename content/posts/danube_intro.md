@@ -81,7 +81,7 @@ I'm using the development environment to showcase the Danube functionality. In o
 
 ### Start the ETCD instance
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 make etcd
 Starting ETCD...
 docker run -d --name etcd-danube -p 2379:2379 \
@@ -90,20 +90,20 @@ docker run -d --name etcd-danube -p 2379:2379 \
     /usr/local/bin/etcd \
     --name etcd-danube \
     --data-dir /etcd-data \
-    --advertise-client-urls http://0.0.0.0:2379 \
-    --listen-client-urls http://0.0.0.0:2379
+    --advertise-client-urls <http://0.0.0.0:2379> \
+    --listen-client-urls <http://0.0.0.0:2379>
 4ae43909314e6764b8938eccbb9271bbfcad13111620cd879844641b0098f3d6
 ETCD instance started on port: 2379
-```
+{{< /code >}}
 
 ### Run 3 Message Brokers in the Danube Cluster
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 cargo build
 cargo build --examples
 
 make brokers RUST_LOG=danube_broker=info
-```
+{{< /code >}}
 
 ### Create the Producer and publish the messages
 
@@ -111,16 +111,16 @@ For complete code check the [producer.rs example](https://github.com/danrusei/da
 
 * **Create the DanubeClient**:
 
-```rust
+{{< code language="rust" isCollapsed="false" >}}
 let client = DanubeClient::builder()
         .service_url("http://[::1]:6650")
         .build()
         .unwrap();
-```
+{{< /code >}}
 
 * **Create the Producer**:
 
-```rust
+{{< code language="rust" isCollapsed="false" >}}
 let topic = "/default/test_topic".to_string();
 
     let json_schema = r#"{"type": "object", "properties": {"field1": {"type": "string"}, "field2": {"type": "integer"}}}"#.to_string();
@@ -134,11 +134,11 @@ let topic = "/default/test_topic".to_string();
 
     let prod_id = producer.create().await?;
     info!("The Producer was created with ID: {:?}", prod_id);
-```
+{{< /code >}}
 
 * **Send the messages**
 
-``` rust
+{{< code language="rust" isCollapsed="false" >}}
 while i < 20 {
         let data = json!({
             "field1": format!{"value{}", i},
@@ -156,13 +156,13 @@ while i < 20 {
         thread::sleep(Duration::from_secs(1));
         i += 1;
     }
-```
+{{< /code >}}
 
 Run the producer example
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 RUST_LOG=producer=info target/debug/examples/producer
-```
+{{< /code >}}
 
 ### Create the Consumer and consume the messages
 
@@ -170,16 +170,16 @@ For complete code check the [consumer.rs example](https://github.com/danrusei/da
 
 * **Create the DanubeClient**:
 
-```rust
+{{< code language="rust" isCollapsed="false" >}}
 let client = DanubeClient::builder()
         .service_url("http://[::1]:6650")
         .build()
         .unwrap();
-```
+{{< /code >}}
 
 * **Create the Consumer and subscribe to a subscription**:
 
-```rust
+{{< code language="rust" isCollapsed="false" >}}
 let topic = "/default/test_topic".to_string();
 
     let mut consumer = client
@@ -193,11 +193,11 @@ let topic = "/default/test_topic".to_string();
     // Subscribe to the topic
     let consumer_id = consumer.subscribe().await?;
     println!("The Consumer with ID: {:?} was created", consumer_id);
-```
+{{< /code >}}
 
 * **Consume the messages**
 
-```rust
+{{< code language="rust" isCollapsed="false" >}}
 // Start receiving messages
     let mut message_stream = consumer.receive().await?;
 
@@ -221,13 +221,13 @@ let topic = "/default/test_topic".to_string();
             }
         }
     }
-```
+{{< /code >}}
 
 Run the consumer example:
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 RUST_LOG=producer=info target/debug/examples/consumer
-```
+{{< /code >}}
 
 ### Check the Brokers logs
 
@@ -235,7 +235,7 @@ Below are the info logs of 2 brokers part of the Danube cluster. These are relev
 
 The Leader broker:
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 tail -f temp/broker_6650.log
 
 INFO danube_broker: Use ETCD storage as metadata persistent store
@@ -253,11 +253,11 @@ INFO create_producer: danube_broker::broker_server: New Producer request with na
 INFO danube_broker::danube_service::load_manager: Attempting to assign the new topic /cluster/unassigned/default/test_topic to a broker
 INFO danube_broker::danube_service::load_manager: The topic /default/test_topic was successfully assign to broker 12706277172540671034
 INFO create_producer: danube_broker::broker_server: Error topic request: The topic metadata was created, need to redo the lookup to find the correct broker
-```
+{{< /code >}}
 
 Another Broker in the cluster that is notified that should host the topic and serve the producer and consumer.
 
-```bash
+{{< code language="bash" isCollapsed="false" >}}
 tail -f temp/broker_6652.log
 
 INFO danube_broker: Use ETCD storage as metadata persistent store
@@ -280,7 +280,7 @@ INFO subscribe: danube_broker::broker_server: New Consumer request with name: te
 INFO subscribe: danube_broker::broker_server: topic_name: /default/test_topic was found
 INFO subscribe: danube_broker::broker_server: The Consumer with id: 17353146059293792005 for subscription: test_subscription, has been created.
 INFO receive_messages: danube_broker::broker_server: The Consumer with id: 17353146059293792005 requested to receive messages
-```
+{{< /code >}}
 
 ## Conclusion
 
