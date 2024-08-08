@@ -14,11 +14,11 @@ contentCopyright: MIT
 
 Currently, the Danube platform exclusively supports **Non-persistent messages**. Meaning that the messages reside solely in memory and are promptly distributed to consumers if they are available, utilizing a dispatch mechanism based on subscription types
 
-For comprehensive information on setting up, configuring, and using Danube, please refer to the official [documentation](https://dev-state.com/danube_docs/).
+For comprehensive information on setting up, configuring, and using Danube, please refer to the official [documentation](https://dev-state.com/danube_docs/) and the [previous article](https://dev-state.com/posts/danube_intro/).
 
 ## Client Libraries
 
-To interact with the Danube Pub/Sub messaging platform, there are client libraries in Rust and Go. Each library is designed to provide seamless integration and ease of use.
+To interact with the Danube Pub/Sub messaging platform, you can use the Rust or Go client libraries. Each library is designed to provide seamless integration and ease of use.
 
 ### Rust Client Library
 
@@ -32,7 +32,7 @@ To interact with the Danube Pub/Sub messaging platform, there are client librari
 - **Description**: The Go client library for interacting with Danube.
 - **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danrusei/danube-go/tree/main/examples).
 
-## Binaries
+## Danube Binaries
 
 The [Danube release](https://github.com/danrusei/danube/releases) includes several binaries for running, interacting with and managing the Danube platform. Here’s an overview of the available binaries and how to download them:
 
@@ -45,9 +45,7 @@ The [Danube release](https://github.com/danrusei/danube/releases) includes sever
 - **Docker Image**: For those who prefer containerized environments.
   - **Docker Image**: `ghcr.io/danrusei/danube-broker:v0.1.2`
 
-### Usage Examples
-
-#### `danube-pubsub` CLI
+### danube-pubsub CLI
 
 The `danube-pubsub` CLI allows you to produce and consume messages. Here are some example usages:
 
@@ -63,9 +61,9 @@ The `danube-pubsub` CLI allows you to produce and consume messages. Here are som
   danube-pubsub consume -s http://127.0.0.1:6650 --subscription "my-subscription"
   ```
 
-#### `danube-admin` CLI
+### danube-admin CLI
 
-The `danube-admin` CLI is used for administrative tasks:
+The `danube-admin` CLI is used for interacting with and managing the Danube cluster:
 
 ```sh
 danube-admin 
@@ -74,7 +72,7 @@ CLI for managing the Danube pub/sub platform
 Usage: danube-admin <COMMAND>
 
 Commands:
-  brokers     - check brokers information in DAnube cluster    
+  brokers     - check Danube cluster brokers info    
   namespaces  - manage and view information about namespaces
   topics      -  manage and view information about topics  
 
@@ -82,11 +80,13 @@ Commands:
 
 ## Queuing and Pub/Sub (Fan out) workflows using Danube
 
-This section describes the steps to set up and use Danube for messaging and queuing on a Linux system.
+This section describes the steps to set up and use Danube for messaging and queuing on Linux.
 
 ### Setup Phase
 
 #### Start the ETCD Instance
+
+The etcd instance or cluster is responsible for the metadata persistent storage and cluster synchronization.
 
 To start the ETCD instance, use Docker with the following command:
 
@@ -106,8 +106,10 @@ docker run -d --name etcd-danube -p 2379:2379 \
 Download the Danube broker binary and start the broker instance with the following command:
 
 ```sh
-danube-broker --cluster-name MY_cluster --meta-store-addr 127.0.0.1:2379
+RUST_LOG=danube_broker=info ./danube-broker --cluster-name MY_cluster --meta-store-addr 127.0.0.1:2379
 ```
+
+or RUST_LOG=danube_broker=trace for detailed logging.
 
 ### Messaging Queuing Pattern Using a Shared Subscription
 
@@ -219,4 +221,4 @@ Received bytes message: 376, with payload: Hello, Danube!
 
 ## Summary
 
-In summary, **Danube** offers an efficient pub/sub messaging platform . With flexible subscription models, straightforward setup, it enables scalable, real-time messaging for diverse applications.
+In summary, **Danube** offers an robust and efficient pub/sub messaging platform . With flexible subscription models, straightforward setup, it enables scalable, real-time messaging for diverse applications.
