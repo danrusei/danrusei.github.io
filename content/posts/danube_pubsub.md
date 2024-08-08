@@ -1,6 +1,6 @@
 ---
-title: "Danube: Pub/Sub Messaging Platform"
-date: 2024-06-29
+title: "Danube: Queuing and Pub/Sub patterns"
+date: 2024-08-08
 draft: false
 categories: ["Rust"]
 author: "Dan Rusei"
@@ -12,7 +12,7 @@ contentCopyright: MIT
 
 [Danube](https://github.com/danrusei/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in **Rust**. Danube aims to be a powerful, flexible and scalable messaging solution.
 
-Currently, the Danube platform exclusively supports Non-persistent messages. Meaning that the messages reside solely in memory and are promptly distributed to consumers if they are available, utilizing a dispatch mechanism based on subscription types
+Currently, the Danube platform exclusively supports **Non-persistent messages**. Meaning that the messages reside solely in memory and are promptly distributed to consumers if they are available, utilizing a dispatch mechanism based on subscription types
 
 For comprehensive information on setting up, configuring, and using Danube, please refer to the official [documentation](https://dev-state.com/danube_docs/).
 
@@ -32,11 +32,9 @@ To interact with the Danube Pub/Sub messaging platform, there are client librari
 - **Description**: The Go client library for interacting with Danube.
 - **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danrusei/danube-go/tree/main/examples).
 
-## Available Binaries
+## Binaries
 
-The Danube release includes several binaries for running, interacting with and managing the Danube platform. Here’s an overview of the available binaries and how to download them:
-
-### Binaries
+The [Danube release](https://github.com/danrusei/danube/releases) includes several binaries for running, interacting with and managing the Danube platform. Here’s an overview of the available binaries and how to download them:
 
 - **Danube Broker**: The core component of the Danube Pub/Sub platform.
 - **Danube Admin**: A command-line interface (CLI) for interacting with and managing the Danube cluster.
@@ -113,7 +111,7 @@ danube-broker --cluster-name MY_cluster --meta-store-addr 127.0.0.1:2379
 
 ### Messaging Queuing Pattern Using a Shared Subscription
 
-**Queueing pattern**: In a shared subscription model, messages are placed in a queue and distributed to all consumers subscribing to that topic. When a new consumer is added, the message load is distributed evenly across all consumers, ensuring that each consumer gets a share of the messages.
+**Queueing pattern**: In a **shared subscription** model, messages are placed in a queue and distributed to all consumers subscribing to that topic. When a new consumer is added, the message load is distributed evenly across all consumers, ensuring that each consumer gets a share of the messages.
 
 **Traffic Distribution**: The shared subscription pattern distributes messages in a round-robin fashion. This means that as new consumers join, the system redistributes messages among all active consumers, which helps in balancing the load and improves overall system performance and scalability.
 
@@ -139,7 +137,16 @@ danube-pubsub consume -s http://127.0.0.1:6650 -m my_shared_subscription
 
 Received bytes message: 135, with payload: Hello, Danube!
 Received bytes message: 136, with payload: Hello, Danube!
-...
+Received bytes message: 137, with payload: Hello, Danube!
+Received bytes message: 138, with payload: Hello, Danube!
+Received bytes message: 139, with payload: Hello, Danube!
+Received bytes message: 140, with payload: Hello, Danube!
+
+!!!! this is where I added the second consumer, notice the message id
+
+Received bytes message: 142, with payload: Hello, Danube!
+Received bytes message: 144, with payload: Hello, Danube!
+Received bytes message: 146, with payload: Hello, Danube!
 Received bytes message: 148, with payload: Hello, Danube!
 ```
 
@@ -152,7 +159,7 @@ danube-pubsub consume -s http://127.0.0.1:6650 -m my_shared_subscription -c othe
 
 Received bytes message: 141, with payload: Hello, Danube!
 Received bytes message: 143, with payload: Hello, Danube!
-...
+Received bytes message: 145, with payload: Hello, Danube!
 Received bytes message: 147, with payload: Hello, Danube!
 ```
 
@@ -202,6 +209,7 @@ This error occurs because an exclusive subscription is designed to be consumed b
 
 ```sh
 danube-pubsub consume -s http://127.0.0.1:6650 -m my_exclusive2 --sub-type exclusive
+
 Received bytes message: 372, with payload: Hello, Danube!
 Received bytes message: 373, with payload: Hello, Danube!
 Received bytes message: 374, with payload: Hello, Danube!
@@ -211,4 +219,4 @@ Received bytes message: 376, with payload: Hello, Danube!
 
 ## Summary
 
-In summary, **Danube** offers an efficient pub/sub messaging platform . With flexible subscription models and straightforward setup, it enables scalable, real-time messaging for diverse applications.
+In summary, **Danube** offers an efficient pub/sub messaging platform . With flexible subscription models, straightforward setup, it enables scalable, real-time messaging for diverse applications.
