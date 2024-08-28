@@ -106,7 +106,7 @@ docker run -d --name etcd-danube -p 2379:2379 \
 Download the Danube broker binary and start the broker instance with the following command:
 
 ```sh
-RUST_LOG=danube_broker=info ./danube-broker --cluster-name MY_cluster --meta-store-addr 127.0.0.1:2379
+RUST_LOG=danube_broker=info ./danube-broker --config-file config/danube_broker.yml
 ```
 
 or RUST_LOG=danube_broker=trace for detailed logging.

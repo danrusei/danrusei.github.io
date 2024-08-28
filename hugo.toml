@@ -6,7 +6,11 @@ theme = "hello-friend"
 paginate = 7
 
 # Google Analytics API key.
-googleAnalytics = "UA-142452733-1"
+# googleAnalytics = "UA-142452733-1"
+
+[services]
+  [services.googleAnalytics]
+    id = "UA-142452733-1"
 
 [params]
   # dir name of your blog content (default is `content/posts`).
