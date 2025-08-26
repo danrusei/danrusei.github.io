@@ -2,7 +2,7 @@
 title: "Setting Up Danube Go Client with Message Brokers on Kubernetes"
 date: 2024-08-28
 draft: false
-categories: ["Go"]
+categories: ["Danube Messaging"]
 author: "Dan Rusei"
 
 autoCollapseToc: true

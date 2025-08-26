@@ -2,7 +2,7 @@
 title: "Danube - Pub-Sub message broker"
 date: 2024-06-29
 draft: false
-categories: ["Rust"]
+categories: ["Danube Messaging"]
 author: "Dan Rusei"
 
 autoCollapseToc: true
@@ -10,13 +10,15 @@ contentCopyright: MIT
 
 ---
 
-[Danube](https://github.com/danrusei/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in Rust. Inspired by the Apache Pulsar messaging and streaming platform, Danube incorporates some similar concepts but is designed to carve its own path within the distributed messaging ecosystem.
+[Danube](https://github.com/danube-messaging/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in Rust. Inspired by the Apache Pulsar messaging and streaming platform, Danube incorporates some similar concepts but is designed to carve its own path within the distributed messaging ecosystem.
 
 At the time of writing, the Danube platform is in the early stages of development and may have missing or incomplete functionalities. Use with caution. Contributions are welcome, and you can also report any issues you encounter.
 
 Currently, the Danube platform exclusively supports Non-persistent messages. Meaning that  the messages reside solely in memory and are promptly distributed to consumers if they are available, utilizing a dispatch mechanism based on subscription types.
 
-## Danube Architecture  
+## Danube Architecture
+
+***This is old architecture diagram, for better understanding of the Danube architecture check the [Danube Docs](https://danube-docs.dev-state.com/architecture/architecture/).***
 
 Danube is a distributed platform that relies on ETCD as a persistent metadata storage system. This setup ensures all metadata created during system operations is reliably stored. The Danube cluster consists of one or more Danube brokers, which are stateless message brokers. This stateless design allows cluster administrators to easily spin up new instances, as topics are automatically distributed across available instances. Producers connect to the brokers to publish messages, while consumers connect to the brokers to consume messages. The communication between producers/consumers and Danube brokers is based on GRPC.
 
@@ -73,11 +75,9 @@ A consumer is a process that attaches to a topic via a subscription and then rec
 * **Shared** - Multiple consumers can subscribe, messages are delivered round-robin, offering good scalability but no order guarantee.
 * **Failover** - Similar to shared subscriptions, but multiple consumers can subscribe, and one actively receives messages.
 
-For additional details on the Pub/Sub messaging design considerations [check out this document](https://github.com/danrusei/danube/blob/main/docs/03-PubSub_messaging_vs_Streaming.md).
-
 ## Demo time
 
-I'm using the development environment to showcase the Danube functionality. In order to replicate the steps below, first need to clone the [Danube repository](https://github.com/danrusei/danube) locally.
+I'm using the development environment to showcase the Danube functionality. In order to replicate the steps below, first need to clone the [Danube repository](https://github.com/danube-messaging/danube) locally.
 
 ### Start the ETCD instance
 
@@ -107,7 +107,7 @@ make brokers RUST_LOG=danube_broker=info
 
 ### Create the Producer and publish the messages
 
-For complete code check the [producer.rs example](https://github.com/danrusei/danube/blob/main/danube-client/examples/producer.rs)
+For complete code check the [producer.rs example](https://github.com/danube-messaging/danube/blob/main/danube-client/examples/producer.rs)
 
 * **Create the DanubeClient**:
 
@@ -286,6 +286,6 @@ INFO receive_messages: danube_broker::broker_server: The Consumer with id: 17353
 
 The Danube broker messaging platform is currently under active development, which means the API may undergo slight changes over time to accommodate all use cases. This ongoing development aims to enhance the feature set & reliability, ensuring it can meet the diverse needs of the users.
 
-Contributions are welcome, and you can report any issues you encounter. If you find this project interesting or are interested in its future development, give it a [GitHub star](https://github.com/danrusei/danube).
+Contributions are welcome, and you can report any issues you encounter. If you find this project interesting or are interested in its future development, give it a [GitHub star](https://github.com/danube-messaging/danube).
 
 The client library is currently written in Rust, with a Go client potentially coming soon. Contributions in other languages, such as Python, Java, etc., are also greatly appreciated.

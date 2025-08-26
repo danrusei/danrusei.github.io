@@ -2,7 +2,7 @@
 title: "Danube: Queuing and Pub/Sub patterns"
 date: 2024-08-08
 draft: false
-categories: ["Rust"]
+categories: ["Danube Messaging"]
 author: "Dan Rusei"
 
 autoCollapseToc: true
@@ -10,11 +10,11 @@ contentCopyright: MIT
 
 ---
 
-[Danube](https://github.com/danrusei/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in **Rust**. Danube aims to be a powerful, flexible and scalable messaging solution.
+[Danube](https://github.com/danube-messaging/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in **Rust**. Danube aims to be a powerful, flexible and scalable messaging solution.
 
 Currently, the Danube platform exclusively supports **Non-persistent messages**. Meaning that the messages reside solely in memory and are promptly distributed to consumers if they are available, utilizing a dispatch mechanism based on subscription types
 
-For comprehensive information on setting up, configuring, and using Danube, please refer to the official [documentation](https://dev-state.com/danube_docs/) and the [previous article](https://dev-state.com/posts/danube_intro/).
+For comprehensive information on setting up, configuring, and using Danube, please refer to the official [documentation](https://danube-docs.dev-state.com/) and the [previous article](https://dev-state.com/posts/danube_intro/).
 
 ## Client Libraries
 
@@ -24,26 +24,26 @@ To interact with the Danube Pub/Sub messaging platform, you can use the Rust or 
 
 - **Library**: [danube-client](https://crates.io/crates/danube-client)
 - **Description**: An asynchronous Rust client library for Danube.
-- **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danrusei/danube/tree/main/danube-client/examples).
+- **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danube-messaging/danube-client/tree/main/examples).
 
 ### Go Client Library
 
 - **Library**: [danube-go](https://pkg.go.dev/github.com/danrusei/danube-go)
 - **Description**: The Go client library for interacting with Danube.
-- **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danrusei/danube-go/tree/main/examples).
+- **Example Usage**: Explore example usage for producers and consumers on [GitHub repository](https://github.com/danube-messaging/danube-go/tree/main/examples).
 
 ## Danube Binaries
 
-The [Danube release](https://github.com/danrusei/danube/releases) includes several binaries for running, interacting with and managing the Danube platform. Here’s an overview of the available binaries and how to download them:
+The [Danube release](https://github.com/danube-messaging/danube/releases) includes several binaries for running, interacting with and managing the Danube platform. Here’s an overview of the available binaries and how to download them:
 
 - **Danube Broker**: The core component of the Danube Pub/Sub platform.
 - **Danube Admin**: A command-line interface (CLI) for interacting with and managing the Danube cluster.
 - **Danube Pub/Sub CLI**: A CLI tool for handling message publishing and consumption.
 
- To download the binaries check the [latest release](https://github.com/danrusei/danube/releases).
+ To download the binaries check the [latest release](https://github.com/danube-messaging/danube/releases).
 
 - **Docker Image**: For those who prefer containerized environments.
-  - **Docker Image**: `ghcr.io/danrusei/danube-broker:v0.1.2`
+  - **Docker Image**: `ghcr.io/danube-messaging/danube-broker:v0.1.2`
 
 ### danube-pubsub CLI
 
