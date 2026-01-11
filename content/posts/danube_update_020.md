@@ -10,6 +10,8 @@ contentCopyright: MIT
 
 ---
 
+> **This article may contain outdated information, for latest read [Danube Documentation](https://danube-docs.dev-state.com/)**
+
 [Danube Messaging](https://github.com/danube-messaging/danube) is an open-source, distributed publish-subscribe (Pub/Sub) message broker system developed in Rust. Danube aims to be a powerful, flexible and scalable messaging solution. Allows single or multiple Producers to publish on the Topics and multiple Subscriptions to consume the messages from the Topic.
 
 This article aims to cover the latest developments on the Danube platform. Before that, here is a summary of Danube's capabilities. Since Danube is still under heavy development, some of these capabilities may need further refinement to improve performance or ensure all corner cases are supported.

@@ -10,6 +10,8 @@ contentCopyright: MIT
 
 ---
 
+> **This article may contain outdated information, for latest read [Danube Documentation](https://danube-docs.dev-state.com/)**
+
 In this article, I'll guide you through the steps to use the [Danube Go client library](https://github.com/danrusei/danube-go) to interact with Danube PubSub messaging brokers running on a Kubernetes cluster hosted locally.
 
 Here’s a diagram of the setup::
