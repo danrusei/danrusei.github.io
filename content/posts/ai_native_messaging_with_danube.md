@@ -10,13 +10,15 @@ contentCopyright: MIT
 
 ---
 
-[Danube Messaging](https://github.com/danube-messaging/danube/tree/main) is a modern cloud-native messaging platform built in Rust, designed for high-performance pub/sub messaging with intelligent cluster management. It provides durable message streaming, schema registry, and automatic load balancing—all while being easy to operate, especially when paired with AI assistants.
+🌊 [Danube Messaging](https://github.com/danube-messaging/danube/tree/main) is a modern cloud-native messaging platform built in Rust, designed for high-performance pub/sub messaging with intelligent cluster management. It provides durable message streaming, schema registry, and automatic load balancing, all while being easy to operate, especially when paired with 🤖 AI assistants.
 
 ## Meet danube-admin: Three Tools in One Binary
 
-The `danube-admin` binary is your Swiss Army knife for Danube cluster management. It combines three powerful interfaces in a single executable:
+The [danube-admin](https://github.com/danube-messaging/danube/tree/main/danube-admin) binary is the Swiss Army knife for Danube cluster management. It combines three powerful interfaces in a single executable:
 
-**1. CLI Mode** - Traditional command-line interface for scripts, automation, and quick operations:
+### 1. >_ CLI Mode
+
+Traditional command-line interface for scripts, automation, and quick operations:
 
 ```bash
 danube-admin brokers list
@@ -24,51 +26,51 @@ danube-admin topics create /default/events --partitions 4
 danube-admin schemas register user-events --schema-type json_schema --file schema.json
 ```
 
-**2. Web Server Mode** - HTTP/REST API for application integrations and the [Danube Admin UI](https://github.com/danube-messaging/danube-admin-ui), a modern React-based web interface for visual cluster management and monitoring:
+### 2.🌐 Web Server Mode
+
+HTTP/REST API for the [Danube Admin UI](https://github.com/danube-messaging/danube-admin-ui), a modern React-based web interface for visual cluster management and monitoring:
 
 ```bash
-danube-admin serve --mode http --port 8080
+danube-admin serve --mode ui ----broker-endpoint broker1:50051 --listen-addr 0.0.0.0:8080
 ```
 
-**3. MCP Mode** - AI-native interface that connects your AI assistant directly to Danube for natural language cluster management:
+### 3. 🔌 MCP Mode
+
+🤖 AI-native interface that connects your AI assistant directly to Danube for natural language cluster management:
 
 ```bash
 danube-admin serve --mode mcp
 ```
 
-This unified approach means you download one binary and get instant access to Danube from your terminal, applications, *and AI assistants*.
+This unified approach means you download one binary and get instant access to Danube from your terminal, applications, *and ✨ AI assistants*.
 
 ## What Danube MCP Provides
 
-The Danube MCP server exposes **40+ specialized tools** and **7 guided workflow prompts** that make cluster management feel like a conversation.
+The Danube MCP server exposes **40+ specialized tools** and **several guided workflow prompts** that make cluster management feel like a conversation.
 
 ### Tools (Automated Actions)
 
-**Cluster Management:**  
-Ask the AI to discover which brokers are running and their roles, check who the cluster leader is, or analyze load distribution across brokers. When you notice imbalance, trigger rebalancing to redistribute topics evenly. Preparing for maintenance? Unload all topics from a broker before shutting it down, then activate it again when ready. Create and manage namespaces to organize your topics by team or environment.
+**🏗️ Cluster Management:**
+Ask the AI to discover which brokers are running and their roles, check who the cluster leader is, or analyze load distribution across brokers. When you notice imbalance, trigger rebalancing to redistribute topics evenly.
 
-**Topic Operations:**  
-Create topics with your preferred partitioning strategy and delivery guarantees—just describe what you need. Configure schema validation for topics to enforce data contracts. Check detailed topic configurations including which broker owns them and what subscriptions are active. When it's time to clean up, delete topics or remove old subscriptions with a simple request.
+Preparing for maintenance? Unload all topics from a broker before shutting it down, then activate it again when ready. Create and manage namespaces to organize the topics by team or environment.
 
-**Schema Registry:**  
-Register new schemas or evolve existing ones while the AI ensures compatibility with previous versions. Ask to see all schema versions for a subject to understand its evolution history. Before making changes, check if your new schema is compatible with the configured compatibility mode (backward, forward, or full). Set compatibility rules per subject, or safely delete schema versions when needed—though the AI will warn you about the risks.
+**📨 Topic Operations:**  
+Create topics with the preferred partitioning strategy and delivery guarantees, just describing the need. Configure schema validation for topics to enforce data contracts.
 
-**Diagnostics:**  
-Get a comprehensive health check that analyzes broker status, load distribution, and identifies issues automatically. When consumers are lagging, ask for a deep-dive analysis that correlates subscription lag with broker load and topic metrics. Request optimization recommendations based on current cluster state—the AI will prioritize actions and explain why they matter.
+Check detailed topic configurations including which broker owns them and what subscriptions are active. Delete topics or remove old subscriptions with a simple request.
 
-**Observability:**  
+**📋 Schema Registry:**  
+Register new schemas or evolve existing ones while the AI ensures compatibility with previous versions. Ask to see all schema versions for a subject to understand its evolution history.
+
+**🔧 Diagnostics & Observability**  
+Get a comprehensive health check that analyzes broker status, load distribution, and identifies issues automatically. Request optimization recommendations based on current cluster state—the AI will prioritize actions and explain why they matter.
+
 Query real-time metrics from Prometheus for the entire cluster, specific brokers, or individual topics—see message rates, throughput, consumer counts, and latency percentiles. Access logs from brokers whether they're running in Docker containers, Kubernetes pods, or as local processes. The AI can correlate metrics and logs to give you the full picture when troubleshooting.
 
 ### Prompts (Guided Workflows)
 
 Prompts are pre-built multi-step workflows that guide the AI through complex operations:
-
-**Troubleshooting:**
-
-- `diagnose_consumer_lag` - Step-by-step lag investigation
-- `diagnose_broker_issues` - Broker health deep-dive
-- `analyze_topic_performance` - Performance bottleneck analysis
-- `cluster_health_check` - Complete health audit
 
 **Operations:**
 
@@ -76,13 +78,19 @@ Prompts are pre-built multi-step workflows that guide the AI through complex ope
 - `manage_schema_evolution` - Safe schema updates with compatibility checks
 - `prepare_cluster_rebalance` - Dry-run validation and execution workflow
 
-## Demo: Managing Danube with AI
+**Troubleshooting:**
+
+- `diagnose_broker_issues` - Broker health deep-dive
+- `analyze_topic_performance` - Performance bottleneck analysis
+- `cluster_health_check` - Complete health audit
+
+## Demo: ✨ Managing Danube with AI
 
 Here's a real conversation showing how natural cluster management becomes with AI. No commands to memorize, no flags to look up—just describe what you need.
 
 ### Checking Cluster Status
 
-**You:** "List the brokers from Danube cluster"
+**ME:** "List the brokers from Danube cluster"
 
 **AI:**
 
@@ -104,7 +112,7 @@ Both brokers are active with one serving as the cluster leader.
 
 ### Identifying Load Imbalance
 
-**You:** "What is the distribution across the brokers?"
+**ME:** "What is the distribution across the brokers?"
 
 **AI:**
 
@@ -124,7 +132,7 @@ Recommendation: Run trigger_rebalance to redistribute topics evenly.
 
 ### Rebalancing with Confidence
 
-**You:** "Yes please rebalance the brokers"
+**ME:** "Yes please rebalance the brokers"
 
 **AI:**
 
@@ -152,7 +160,7 @@ Improved Metrics:
 
 ### Creating Topics with Intelligence
 
-**You:** "I would like to create a topic, what info do I need to provide?"
+**ME:** "I would like to create a topic, what info do I need to provide?"
 
 **AI:**
 
@@ -172,7 +180,7 @@ Available namespaces: default, system
 Would you like me to create a specific topic?
 ```
 
-**You:** "Great, create topic /default/my_ai_topic, reliable with 4 partitions and no schema"
+**ME:** "Great, create topic /default/my_ai_topic, reliable with 4 partitions and no schema"
 
 **AI:**
 
@@ -190,7 +198,7 @@ The topic is ready for use with reliable persistence!
 
 ### Cluster Health Monitoring
 
-**You:** "Give me some statistics about the brokers"
+**ME:** "Give me some statistics about the brokers"
 
 **AI:**
 
@@ -219,7 +227,7 @@ Summary: Cluster is healthy and well-balanced, ready for traffic.
 
 ### Using Guided Workflows
 
-**You:** `/danube-admin/cluster_health_check`
+**ME:** `/danube-admin/cluster_health_check`
 
 **AI:**
 
@@ -242,7 +250,7 @@ Step 3: Load Distribution ✅
 Step 4: Automated Diagnostics ✅
 - Connectivity: All brokers reachable
 - Configuration: Proper setup
-- Namespaces: 14 available
+- Namespaces: 2 available
 
 Step 5: Recommendations
 💡 Medium Priority: Consider 3+ brokers for production HA
@@ -304,11 +312,11 @@ Download `danube-admin-windows.exe` from the releases page.
 docker run --rm ghcr.io/danube-messaging/danube-admin:latest danube-admin --help
 ```
 
-### 3. Configure MCP in Your AI IDE
+### 3. Configure AI MCP in the IDE
 
 #### Windsurf
 
-Add to your Windsurf MCP config (`~/.codeium/windsurf/mcp_config.json`):
+Windsurf MCP config (`~/.codeium/windsurf/mcp_config.json`):
 
 ```json
 {
@@ -331,7 +339,7 @@ Add to your Windsurf MCP config (`~/.codeium/windsurf/mcp_config.json`):
 
 #### VSCode (with Continue extension or similar)
 
-Add to your VSCode MCP config:
+VSCode MCP config:
 
 ```json
 {
@@ -398,7 +406,7 @@ deployment:
         container: "danube-broker2"
 ```
 
-Then update your MCP config to include `--config /path/to/mcp-config.yml` in the args.
+Then update the MCP config to include `--config /path/to/mcp-config.yml` in the args.
 
 ### 5. Start Using AI
 
@@ -408,7 +416,6 @@ Restart your AI IDE and start asking questions:
 - "Create a new topic for user events with 4 partitions"
 - "Check if the cluster is balanced"
 - "Show me metrics for the /default/events topic"
-- "Run a complete health check"
 
 Or use guided workflows from the prompt picker:
 
@@ -426,8 +433,6 @@ Traditional messaging platforms require deep expertise: memorizing CLI flags, un
 ✅ **Proactive monitoring** - AI spots issues before you ask  
 ✅ **Zero learning curve** - New team members productive from day one  
 
-Whether you're debugging consumer lag at 3 AM, evolving schemas safely in production, or just checking if your cluster is healthy—Danube with AI makes it feel effortless.
-
 ---
 
-**Try it yourself:** Star the [Danube repository](https://github.com/danube-messaging/danube) and contribute to the project on GitHub!
+**Show your support:** Star the [Danube repository](https://github.com/danube-messaging/danube) or contribute to the project on GitHub!
