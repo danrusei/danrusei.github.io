@@ -28,17 +28,17 @@ etcd worked. It gave us linearizable reads and writes, watch-based event streams
 
 Before diving into the replacement, here's what etcd provided, six distinct usage patterns we needed to replicate:
 
-1. **Broker registration & liveness** — Each broker registered itself with an etcd lease. A background keep-alive task renewed the lease periodically. If the broker died, the lease expired, the key was deleted, and watchers detected the failure.
+1. **Broker registration & liveness**: Each broker registered itself with an etcd lease. A background keep-alive task renewed the lease periodically. If the broker died, the lease expired, the key was deleted, and watchers detected the failure.
 
-2. **Leader election** — Brokers competed for a `/cluster/leader` key using lease-based compare-and-swap. The winner became the cluster leader (responsible for topic assignment and rebalancing).
+2. **Leader election**: Brokers competed for a `/cluster/leader` key using lease-based compare-and-swap. The winner became the cluster leader (responsible for topic assignment and rebalancing).
 
-3. **Metadata KV store** — Topics, namespaces, schemas, subscriptions, all stored as JSON values under hierarchical key paths like `/cluster/brokers/{id}/{namespace}/{topic}`.
+3. **Metadata KV store**: Topics, namespaces, schemas, subscriptions, all stored as JSON values under hierarchical key paths like `/cluster/brokers/{id}/{namespace}/{topic}`.
 
-4. **Watch/event bus** — etcd's prefix watch API powered the broker's event-driven architecture. `LoadManager` and `BrokerWatcher` subscribed to key prefixes and reacted to changes.
+4. **Watch/event bus**: etcd's prefix watch API powered the broker's event-driven architecture. `LoadManager` and `BrokerWatcher` subscribed to key prefixes and reacted to changes.
 
-5. **Load reporting** — Brokers periodically wrote load metrics; the leader watched for them and made rebalancing decisions.
+5. **Load reporting**: Brokers periodically wrote load metrics; the leader watched for them and made rebalancing decisions.
 
-6. **WAL metadata** — Persistent storage (Write-Ahead Log) metadata was stored in etcd alongside everything else.
+6. **WAL metadata**: Persistent storage (Write-Ahead Log) metadata was stored in etcd alongside everything else.
 
 ## The Replacement: openraft + redb
 
@@ -54,10 +54,10 @@ Every broker now runs a Raft node in-process. There is no external metadata serv
 
 The stack has four layers, top to bottom:
 
-1. **Broker layer** — `danube-broker` calls a `MetadataStore` trait (`get`, `put`, `delete`, `watch`). It doesn't know whether the backend is etcd or Raft.
-2. **RaftMetadataStore** — the trait implementation. Reads go to the local state machine (in-memory `BTreeMap`). Writes are proposed through Raft, with automatic leader forwarding. Watch events are delivered via `tokio::sync::broadcast` channels.
-3. **openraft::Raft** — the consensus engine. It replicates log entries across peers, manages elections, and drives the state machine (`DanubeStateMachine`: `BTreeMap` + watchers + TTL tracking).
-4. **Storage & network** — `log_store` (redb, on-disk) persists the Raft log with ACID transactions. `network.rs` (tonic gRPC) handles peer-to-peer communication for AppendEntries, Vote, and InstallSnapshot RPCs.
+1. **Broker layer**: `danube-broker` calls a `MetadataStore` trait (`get`, `put`, `delete`, `watch`). It doesn't know whether the backend is etcd or Raft.
+2. **RaftMetadataStore**: the trait implementation. Reads go to the local state machine (in-memory `BTreeMap`). Writes are proposed through Raft, with automatic leader forwarding. Watch events are delivered via `tokio::sync::broadcast` channels.
+3. **openraft::Raft**: the consensus engine. It replicates log entries across peers, manages elections, and drives the state machine (`DanubeStateMachine`: `BTreeMap` + watchers + TTL tracking).
+4. **Storage & network**: `log_store` (redb, on-disk) persists the Raft log with ACID transactions. `network.rs` (tonic gRPC) handles peer-to-peer communication for AppendEntries, Vote, and InstallSnapshot RPCs.
 
 The key insight is that **the Raft log and the state machine serve different purposes**:
 
@@ -73,7 +73,7 @@ On restart, the persisted log is replayed through the state machine to reconstru
 
 etcd leases are server-side timers. We replaced them with explicit TTL tracking in the state machine:
 
-- `PutWithTTL { key, value, ttl_ms }` — stores the value with an expiration timestamp
+- `PutWithTTL { key, value, ttl_ms }`, stores the value with an expiration timestamp
 - A background **TTL worker** on the leader periodically scans for expired keys and proposes their deletion through Raft
 - The deletion goes through consensus, so all nodes agree on when a key expires
 - Watchers see the same `Delete` event they saw with etcd lease expiration
@@ -141,20 +141,20 @@ This gives operators explicit, staged control over cluster scaling, no automatic
 
 ## Key Advantages for Danube
 
-- **Zero external dependencies** — No etcd cluster to deploy, monitor, or upgrade. A Danube cluster is just N broker processes.
-- **Single binary deployment** — One `danube-broker` binary contains the consensus layer, metadata store, and message broker. Build once, deploy anywhere.
-- **Faster failure detection** — Raft heartbeats detect broker failure in ~2-3 seconds vs over 20 seconds with etcd lease TTLs.
-- **Lower read latency** — Metadata reads hit an in-memory BTreeMap in the same process. No network round-trip, no serialization.
-- **Unified cluster membership** — Raft *is* the membership protocol. Explicit roles (voter/learner) and staged join workflow (`--join` → add → promote → activate) give operators full control over scaling.
-- **Pure Rust stack** — openraft + redb + tonic + tokio. No CGO, no cross-language FFI, single `cargo build`, single debugging stack.
-- **Simpler codebase** — `LocalCache` (an in-process replica of remote etcd data) was eliminated entirely. The Raft state machine *is* the local cache. Watch events use `tokio::sync::broadcast`, no network reconnection logic.
+- **Zero external dependencies**: No etcd cluster to deploy, monitor, or upgrade. A Danube cluster is just N broker processes.
+- **Single binary deployment**: One `danube-broker` binary contains the consensus layer, metadata store, and message broker. Build once, deploy anywhere.
+- **Faster failure detection**: Raft heartbeats detect broker failure in ~2-3 seconds vs over 20 seconds with etcd lease TTLs.
+- **Lower read latency**: Metadata reads hit an in-memory BTreeMap in the same process. No network round-trip, no serialization.
+- **Unified cluster membership**: Raft *is* the membership protocol. Explicit roles (voter/learner) and staged join workflow (`--join` → add → promote → activate) give operators full control over scaling.
+- **Pure Rust stack**: openraft + redb + tonic + tokio. No CGO, no cross-language FFI, single `cargo build`, single debugging stack.
+- **Simpler codebase**: `LocalCache` (an in-process replica of remote etcd data) was eliminated entirely. The Raft state machine *is* the local cache. Watch events use `tokio::sync::broadcast`, no network reconnection logic.
 
 ## Learn More
 
 Danube's documentation covers detailed architecture:
 
-- **[Architecture Overview](https://danube-docs.dev-state.com/architecture/architecture/)** — System diagram and component interaction
-- **[Scaling the Cluster](https://danube-docs.dev-state.com/concepts/scaling_cluster/)** — Node lifecycle, add/promote/activate workflow
+- **[Architecture Overview](https://danube-docs.dev-state.com/architecture/architecture/)**: System diagram and component interaction
+- **[Scaling the Cluster](https://danube-docs.dev-state.com/concepts/scaling_cluster/)**: Node lifecycle, add/promote/activate workflow
 
 ### Get Started
 
