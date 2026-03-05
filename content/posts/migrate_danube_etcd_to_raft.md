@@ -24,7 +24,7 @@ etcd worked. It gave us linearizable reads and writes, watch-based event streams
 
 **The consistency guarantees are identical.** etcd is itself a Raft implementation (over boltdb). Replacing it with another Raft implementation (openraft over redb) provides mathematically the same guarantees, linearizable writes, quorum-based durability, partition tolerance. We're not trading correctness for convenience, we're removing a layer of indirection.
 
-## What etcd Did for Danube
+## What Etcd did for Danube
 
 Before diving into the replacement, here's what etcd provided, six distinct usage patterns we needed to replicate:
 
@@ -52,29 +52,12 @@ Before diving into the replacement, here's what etcd provided, six distinct usag
 
 Every broker now runs a Raft node in-process. There is no external metadata service.
 
-```bash
-┌─────────────────────────────────────────────────────────┐
-│  danube-broker                                          │
-│    calls MetadataStore trait: get / put / watch / ...   │
-└──────────────────────┬──────────────────────────────────┘
-                       │
-┌──────────────────────▼──────────────────────────────────┐
-│  RaftMetadataStore                                      │
-│    Reads  → local state machine (in-memory BTreeMap)    │
-│    Writes → propose through Raft (with leader forward)  │
-│    Watch  → broadcast channels on state machine         │
-└──────────┬──────────────────────────────┬───────────────┘
-           │ writes                       │ reads
-┌──────────▼──────────┐    ┌──────────────▼───────────────┐
-│  openraft::Raft     │    │  DanubeStateMachine          │
-│  (consensus engine) │───▶│  (BTreeMap + watchers + TTL) │
-└──────┬──────┬───────┘    └──────────────────────────────┘
-       │      │
-┌──────▼──┐ ┌─▼──────────────┐
-│log_store│ │ network.rs     │◄──► gRPC handlers on peer nodes
-│ (redb)  │ │ (gRPC client)  │
-└─────────┘ └────────────────┘
-```
+The stack has four layers, top to bottom:
+
+1. **Broker layer** — `danube-broker` calls a `MetadataStore` trait (`get`, `put`, `delete`, `watch`). It doesn't know whether the backend is etcd or Raft.
+2. **RaftMetadataStore** — the trait implementation. Reads go to the local state machine (in-memory `BTreeMap`). Writes are proposed through Raft, with automatic leader forwarding. Watch events are delivered via `tokio::sync::broadcast` channels.
+3. **openraft::Raft** — the consensus engine. It replicates log entries across peers, manages elections, and drives the state machine (`DanubeStateMachine`: `BTreeMap` + watchers + TTL tracking).
+4. **Storage & network** — `log_store` (redb, on-disk) persists the Raft log with ACID transactions. `network.rs` (tonic gRPC) handles peer-to-peer communication for AppendEntries, Vote, and InstallSnapshot RPCs.
 
 The key insight is that **the Raft log and the state machine serve different purposes**:
 
@@ -82,9 +65,7 @@ The key insight is that **the Raft log and the state machine serve different pur
 
 - The **state machine** (BTreeMap, in-memory) is the derived KV store. It's where data becomes "available" for reads. It's updated *after* a quorum has persisted the log entry.
 
-Reads never touch disk, they go straight to the in-memory BTreeMap. Writes go through Raft consensus (leader persists → replicates to followers → quorum ACKs → committed → applied to state machine on all nodes).
-
-On restart, the persisted log is replayed through the state machine to reconstruct the in-memory state. Periodic snapshots compact the log so restart doesn't require replaying the entire history. Openraft triggers a snapshot after a configurable number of applied log entries, and old log entries before the snapshot are purged automatically.
+On restart, the persisted log is replayed through the state machine to reconstruct the in-memory state. Periodic snapshots compact the log so restart doesn't require replaying the entire history. .
 
 ## Replacing Each etcd Pattern
 
@@ -99,11 +80,11 @@ etcd leases are server-side timers. We replaced them with explicit TTL tracking 
 
 ### Leader Election → Free
 
-With etcd, we implemented leader election on top of leases and CAS. With embedded Raft, the Raft leader *is* the cluster leader. This entire subsystem was replaced by a lightweight handle that reads `raft.metrics().current_leader`. Faster failover (~2-3 seconds vs ~30-40 seconds), formally proven, zero code to maintain.
+With etcd, we implemented leader election on top of leases and CAS. With embedded Raft, the Raft leader *is* the cluster leader. This entire subsystem was replaced by a lightweight handle that reads `raft.metrics().current_leader`, no code to maintain.
 
 ### Watch Events → Broadcast Channels
 
-etcd's watch API was replaced with `tokio::sync::broadcast` channels. Every time the state machine applies a command, it emits a `WatchEvent` (Put or Delete) to all watchers whose prefix matches the key. The `WatchStream` type is unchanged — downstream consumers (`BrokerWatcher`, `LoadManager`) don't know the difference.
+etcd's watch API was replaced with `tokio::sync::broadcast` channels. Every time the state machine applies a command, it emits a `WatchEvent` (Put or Delete) to all watchers whose prefix matches the key. The `WatchStream` type is unchanged, downstream consumers (`BrokerWatcher`, `LoadManager`) don't know the difference.
 
 ### Metadata KV → Same Interface
 
@@ -150,48 +131,21 @@ This gives operators explicit, staged control over cluster scaling, no automatic
 
 ## Implementation Challenges
 
-### Serialization: bincode vs serde_json
+**Serialization.** We initially used bincode for Raft RPC payloads, but `RaftCommand` contains `serde_json::Value` fields which require `deserialize_any`, unsupported by bincode. Switching network serialization to serde_json fixed it. Raft metadata (Vote, LogId) still uses bincode since those are simple fixed-size types.
 
-Our initial implementation used bincode to serialize Raft RPC payloads (AppendEntries, Vote, InstallSnapshot). This worked until we hit a wall: `RaftCommand` contains `serde_json::Value` fields, and bincode does not support `serde::Deserializer::deserialize_any`, which `serde_json::Value` requires.
+**Read-after-write on followers.** With etcd, network round-trip latency masked the gap between a write being committed and the local state reflecting it. With embedded Raft, writes return almost instantly but a follower's state machine may lag by milliseconds. This is inherent to replicated systems and negligible in production. Removing `LocalCache` (the old in-process etcd replica) also eliminated an entire class of stale-cache bugs.
 
-The error surfaced as a cryptic deserialization failure on followers during log replication. The fix was straightforward, switch all network RPC serialization from bincode to serde_json. Log entries (stored in redb) already used serde_json, so this brought everything into alignment. Raft metadata (Vote, LogId) still uses bincode since those are simple fixed-size types with no `Value` fields.
+**Timeout tuning.** Default openraft timeouts (50ms heartbeat) were too aggressive for gRPC + JSON over a network. We tuned to 500ms heartbeat / 1500-3000ms election timeout, still much faster than etcd lease-based failure detection.
 
-### Read-After-Write Consistency
+**Write forwarding.** Only the Raft leader can commit writes. We added a `ClientWrite` gRPC RPC so followers transparently proxy writes to the leader. From the broker's perspective, `put()` works on any node.
 
-After the migration, several schema compatibility tests started failing. The symptom: setting a schema's compatibility mode to "none" and then immediately registering a breaking schema would fail with "mode: Backward", the old default.
-
-The root cause is inherent to Raft's replicated architecture. Writes go through the leader and are applied to each node's state machine after consensus. On a follower, there is a small window between a write being acknowledged and the follower's local state machine reflecting it. With etcd, the round-trip latency to a remote server masked this, by the time the response came back over the network, the watch had usually fired. With embedded Raft on a single node, the write returns almost instantly, but the follower's state machine may lag by a few hundred milliseconds.
-
-This is the expected behavior of any eventually-consistent read path in a replicated system. In production, this window is negligible, operators don't issue sub-second sequences of dependent admin commands.
-
-With `LocalCache` removed entirely (it was originally introduced to avoid network round-trips to remote etcd), all reads now go directly to the Raft state machine, an in-memory BTreeMap in the same process. There's no second copy of the data, no cache invalidation bugs, and no stale-cache surprises.
-
-### Timeout Tuning
-
-The default openraft timeouts (50ms heartbeat, 150-300ms election timeout) were too aggressive for gRPC + JSON serialization over a network. This caused spurious election timeout warnings in the logs. We tuned them to 500ms heartbeat and 1500-3000ms election timeout, still much faster than etcd's lease-based failure detection.
-
-### Write Forwarding
-
-In Raft, only the leader can commit writes. When a follower receives a write request, it needs to forward it. openraft signals this with a `ForwardToLeader` error containing the leader's address. We added a `ClientWrite` gRPC RPC so followers can transparently proxy writes to the leader. From the broker's perspective, `put()` works on any node.
-
-## Takeaways
-
-**The MetadataStore trait abstraction was the key enabler.** Because all broker code programmed to a trait rather than directly to etcd, the migration was mostly a backend swap. Most files in the `resources/` layer needed zero changes.
-
-**Embedded consensus is simpler than it sounds.** openraft handles the hard parts (leader election, log replication, snapshot transfer, membership changes). What we implemented is plumbing: a state machine that applies commands to a BTreeMap, a log store that writes to redb, and a gRPC transport that shuttles bytes between peers.
-
-**Read-after-write on followers has inherent latency.** In any replicated system, a follower's local state lags slightly behind the leader. This is not a bug, it's the trade-off for local reads without network hops.
-
-**etcd is Raft. openraft is Raft. The guarantees are the same.** We didn't trade correctness for simplicity. We removed a network hop and an operational dependency. The consensus algorithm and the formal guarantees it provides, is mathematically identical.
-
-## Key Advantages
+## Key Advantages for Danube
 
 - **Zero external dependencies** — No etcd cluster to deploy, monitor, or upgrade. A Danube cluster is just N broker processes.
 - **Single binary deployment** — One `danube-broker` binary contains the consensus layer, metadata store, and message broker. Build once, deploy anywhere.
 - **Faster failure detection** — Raft heartbeats detect broker failure in ~2-3 seconds vs over 20 seconds with etcd lease TTLs.
 - **Lower read latency** — Metadata reads hit an in-memory BTreeMap in the same process. No network round-trip, no serialization.
 - **Unified cluster membership** — Raft *is* the membership protocol. Explicit roles (voter/learner) and staged join workflow (`--join` → add → promote → activate) give operators full control over scaling.
-- **Reduced resource footprint** — No separate etcd processes, no extra network hops, no duplicate storage. One redb file per broker replaces an entire etcd data directory.
 - **Pure Rust stack** — openraft + redb + tonic + tokio. No CGO, no cross-language FFI, single `cargo build`, single debugging stack.
 - **Simpler codebase** — `LocalCache` (an in-process replica of remote etcd data) was eliminated entirely. The Raft state machine *is* the local cache. Watch events use `tokio::sync::broadcast`, no network reconnection logic.
 
@@ -201,8 +155,6 @@ Danube's documentation covers detailed architecture:
 
 - **[Architecture Overview](https://danube-docs.dev-state.com/architecture/architecture/)** — System diagram and component interaction
 - **[Scaling the Cluster](https://danube-docs.dev-state.com/concepts/scaling_cluster/)** — Node lifecycle, add/promote/activate workflow
-- **[Cluster CLI Reference](https://danube-docs.dev-state.com/danube_admin/admin_cli/cluster/)** — `cluster status`, `add-node`, `promote-node`, `remove-node`
-- **[Broker Configuration](https://danube-docs.dev-state.com/reference/broker_configuration/)** — Full `danube_broker.yml` reference including `meta_store` settings
 
 ### Get Started
 
